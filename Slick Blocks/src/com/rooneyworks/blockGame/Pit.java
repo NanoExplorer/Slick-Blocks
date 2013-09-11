@@ -9,7 +9,7 @@ import com.rooneyworks.Blocks.*;
 public class Pit {
 
 	private int[] [] fallenBlocks = null; //-1= unoccupied, 0, 1, 2, 3 = colors
-	private int[] [] fallenBlocksTwo = null; //a copy of fallenBlocks that exists for the sole purpose of facilitating the row delete animation
+	//private int[] [] fallenBlocksTwo = null; //a copy of fallenBlocks that exists for the sole purpose of facilitating the row delete animation
 	ArrayList<Image> blockImages = null;
 	final int PIT_X = 52;	//contains the pixel offset to the first block
     final int PIT_Y = 18;
