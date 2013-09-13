@@ -9,7 +9,6 @@ public class SlickBlocksGame extends StateBasedGame {
 
 	public static final int MAINMENUSTATE = 0;
 	public static final int GAMEPLAYSTATE = 1;
-	//HELLO ECLIPSE!!!!
 	/**
 	 * Constructor for the game object
 	 * defines states MainMenu and GamePlay
