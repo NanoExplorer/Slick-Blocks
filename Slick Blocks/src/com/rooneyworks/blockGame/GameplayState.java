@@ -33,6 +33,8 @@ public class GameplayState extends BasicGameState {
 	int fallInterval;
 	final int keyRepeatInterval = 80;
 	final int firstKeyRepeatInterval = 160;
+	final int PAUSE_DELAY_TIME = 1000;
+	
 	int keyRepeat;
 	int lastKey;
 	
@@ -122,6 +124,12 @@ public class GameplayState extends BasicGameState {
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 		Input input = container.getInput();
+		
+		if(pauseDelayTimer > 0) {
+			pauseDelayTimer -= delta;
+		}
+		
+		
 		switch(animationState) {
 		case READY:
 			//will use the int timeToFall as the counter to determine how much time is left before the game starts
@@ -160,14 +168,12 @@ public class GameplayState extends BasicGameState {
 			rowAnimation();
 			break;
 		case PAUSED:
-			if(pauseDelayTimer > 0) {
-				pauseDelayTimer -= delta;
-			}
+
 			
 			
-			if(input.isKeyDown(Input.KEY_SPACE) && pauseDelayTimer < 0){
+			if(input.isKeyDown(Input.KEY_SPACE) && pauseDelayTimer <= 0){
 				animationState = AnimationStates.PLAYING;
-				pauseDelayTimer = 1000;
+				pauseDelayTimer = PAUSE_DELAY_TIME;
 			}
 			//display pause menu....
 			break;
@@ -265,6 +271,11 @@ public class GameplayState extends BasicGameState {
 		} else if(input.isKeyDown(Input.KEY_DOWN)){
 			timeToFall -= 4*delta;
 			lastKey = Input.KEY_DOWN;
+			
+		} else if(input.isKeyDown(Input.KEY_SPACE) && pauseDelayTimer <= 0){
+			animationState = AnimationStates.PAUSED;
+			pauseDelayTimer = PAUSE_DELAY_TIME;
+		
 		
 		} else {
 			lastKey = -1337;
