@@ -28,29 +28,33 @@ public class GameplayState extends BasicGameState {
 	
 	ArrayList<Image> blockImages = null;
 	Pit pit = null;
+	DisplayPit pitTwo = null;
 	
 	int timeToFall;
 	int fallInterval;
 	final int keyRepeatInterval = 80;
 	final int firstKeyRepeatInterval = 160;
-	final int PAUSE_DELAY_TIME = 1000;
+
 	
 	int keyRepeat;
 	int lastKey;
 	
 	int animationTimer;
 	int pauseDelayTimer; //makes sure that you can't just hold down space and play the game at 1/2 speed
+	final int PAUSE_DELAY_TIME = 1000; //The constant of how long the pause thingy is paused or whatever
+	
+	//These next two variables control the pause animation
+	int pauseAnimX;
+	int pauseAnimY;
+	final int PAUSE_ANIM_DELAY =20;
 	
 	float scale;
 	
 	String readySetText;
-	
 	AngelCodeFont theFont = null;		//load the font
-	Color myOrange = null;			//set the color of myOrange
-	
+	Color myOrange = null;			//set the color of myOrange	
 	AnimationStates animationState;
-	
-	boolean spaceWasPressed;
+
 	
 	GameplayState(int stateID) {
 		this.stateID = stateID;
@@ -75,6 +79,7 @@ public class GameplayState extends BasicGameState {
 		   blockImages.add(master.getSubImage(0, i*28, 28, 28));
 		
 		pit = new Pit(blockImages);
+		pitTwo = new DisplayPit(blockImages);
 		timeToFall = 0;
 		fallInterval = 240;
 		keyRepeat = firstKeyRepeatInterval;
@@ -116,6 +121,10 @@ public class GameplayState extends BasicGameState {
 			break;
 		case GAME_OVER:
 			pit.render(g);
+			break;
+		case PAUSE_IN:
+			break;
+		case PAUSE_OUT:
 			break;
 		}
 	}
@@ -168,9 +177,6 @@ public class GameplayState extends BasicGameState {
 			rowAnimation();
 			break;
 		case PAUSED:
-
-			
-			
 			if(input.isKeyDown(Input.KEY_SPACE) && pauseDelayTimer <= 0){
 				animationState = AnimationStates.PLAYING;
 				pauseDelayTimer = PAUSE_DELAY_TIME;
@@ -179,6 +185,11 @@ public class GameplayState extends BasicGameState {
 			break;
 		case GAME_OVER:
 			//play game over animation
+			break;
+		case PAUSE_IN:
+			break;
+		case PAUSE_OUT:
+			break;
 		}
 		
 	}
@@ -272,9 +283,10 @@ public class GameplayState extends BasicGameState {
 			timeToFall -= 4*delta;
 			lastKey = Input.KEY_DOWN;
 			
-		} else if(input.isKeyDown(Input.KEY_SPACE) && pauseDelayTimer <= 0){
-			animationState = AnimationStates.PAUSED;
+		} else if(input.isKeyDown(Input.KEY_SPACE) && pauseDelayTimer <= 0){ //PAUSE MENU!!!!!!!!!!!!!!
+			animationState = AnimationStates.PAUSE_IN;
 			pauseDelayTimer = PAUSE_DELAY_TIME;
+			pitTwo.copyArray(pit.getPit());
 		
 		
 		} else {

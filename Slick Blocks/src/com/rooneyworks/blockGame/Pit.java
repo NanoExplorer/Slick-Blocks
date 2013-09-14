@@ -145,4 +145,8 @@ public class Pit {
 			}
 		}
 	}
+	
+	public int[][] getPit() {
+		return fallenBlocks;
+	}
 }
