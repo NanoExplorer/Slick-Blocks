@@ -32,8 +32,8 @@ public class GameplayState extends BasicGameState {
 	
 	int timeToFall;
 	int fallInterval;
-	final int keyRepeatInterval = 80;
-	final int firstKeyRepeatInterval = 160;
+	final int KEY_REPEAT_INTERVAL = 80;
+	final int FIRST_KEY_REPEAT_INTERVAL = 160;
 
 	
 	int keyRepeat;
@@ -41,12 +41,10 @@ public class GameplayState extends BasicGameState {
 	
 	int animationTimer;
 	int pauseDelayTimer; //makes sure that you can't just hold down space and play the game at 1/2 speed
-	final int PAUSE_DELAY_TIME = 1000; //The constant of how long the pause thingy is paused or whatever
-	
-	//These next two variables control the pause animation
-	int pauseAnimX;
-	int pauseAnimY;
+	final int PAUSE_DELAY_TIME = 1000; //How long the game will delay before letting you pause or unpause again. (This is basically an animation timer)
 	final int PAUSE_ANIM_DELAY =20;
+	
+	int blockAnimationX, blockAnimationY;
 	
 	float scale;
 	
@@ -78,14 +76,16 @@ public class GameplayState extends BasicGameState {
 		for(int i = 0; i < 4; i++)
 		   blockImages.add(master.getSubImage(0, i*28, 28, 28));
 		
+		blockAnimationX = blockAnimationY = 0;
+		
 		pit = new Pit(blockImages);
 		pitTwo = new DisplayPit(blockImages);
 		timeToFall = 0;
 		fallInterval = 240;
-		keyRepeat = firstKeyRepeatInterval;
+		keyRepeat = FIRST_KEY_REPEAT_INTERVAL;
 		animationTimer = 2000; //animationtimer will start out counting down to zero and will be used to calculate when to display the "ready set go" animation
 		animationState = AnimationStates.READY;
-		theFont = new AngelCodeFont("res/fnt/GameGui.fnt", "res/fnt/GameGui_0.png");		//load the font
+		theFont = new AngelCodeFont("res/fnt/GameGui.fnt", "res/fnt/GameGui_0.png");		//load the font (Used for scores and other stuff)
 		myOrange = new Color(0xF24C00);			//set the color of myOrange
 		
 		
@@ -114,17 +114,18 @@ public class GameplayState extends BasicGameState {
 			break;
 		case DELETING_ROW:
 			pit.render(g);
-
 			break;
 		case PAUSED:
-			//the pit shouldn't render. There's no way to get into this state currently, however.
+			pitTwo.render(g);
 			break;
 		case GAME_OVER:
 			pit.render(g);
 			break;
 		case PAUSE_IN:
+			pitTwo.render(g);
 			break;
 		case PAUSE_OUT:
+			pitTwo.render(g);
 			break;
 		}
 	}
@@ -141,7 +142,7 @@ public class GameplayState extends BasicGameState {
 		
 		switch(animationState) {
 		case READY:
-			//will use the int timeToFall as the counter to determine how much time is left before the game starts
+			//will use the int timeToFall as the counter to determine how much time is left before the game starts (Basically time before the first fall)
 			animationTimer -= delta;
 			if(animationTimer <= 0) {
 				animationState = AnimationStates.SET;
@@ -187,6 +188,26 @@ public class GameplayState extends BasicGameState {
 			//play game over animation
 			break;
 		case PAUSE_IN:
+			blockAnimationX = 0;
+			blockAnimationY = 1;
+			if(blockAnimationY % 2 ==0) {
+				blockAnimationX++;
+			} else {
+				blockAnimationX--;
+			}
+			if(blockAnimationX >= 10) {
+				blockAnimationY++;
+				blockAnimationX -= 1;
+			} else if (blockAnimationX < 0) {
+				blockAnimationY++;
+				blockAnimationX += 1;
+			}
+			if(blockAnimationY >= 20) {
+				animationState = AnimationStates.PAUSED;
+				
+			}
+			pitTwo.setBlock(blockAnimationX, blockAnimationY, 1);
+			
 			break;
 		case PAUSE_OUT:
 			break;
@@ -242,10 +263,10 @@ public class GameplayState extends BasicGameState {
 				keyRepeat -= delta;				//cont'd
 				if(keyRepeat <= 0) {					//once that delay has passed, rotate it and set the timer
 					pit.update(OperationType.ROTATE);
-					keyRepeat = keyRepeatInterval;		//sets the timer for the smaller amount of time (made sense at the time)
+					keyRepeat = KEY_REPEAT_INTERVAL;		//sets the timer for the smaller amount of time (made sense at the time)
 				}
 			} else {
-				keyRepeat = firstKeyRepeatInterval;		//the first time that up is pressed, sets timer to the initial delay
+				keyRepeat = FIRST_KEY_REPEAT_INTERVAL;		//the first time that up is pressed, sets timer to the initial delay
 				pit.update(OperationType.ROTATE);		//and rotates the block
 			}
 		
@@ -256,10 +277,10 @@ public class GameplayState extends BasicGameState {
 				keyRepeat -= delta;
 				if(keyRepeat<= 0) {
 					pit.update(OperationType.LEFT);
-					keyRepeat= keyRepeatInterval;
+					keyRepeat= KEY_REPEAT_INTERVAL;
 				}
 			} else {
-				keyRepeat = firstKeyRepeatInterval;
+				keyRepeat = FIRST_KEY_REPEAT_INTERVAL;
 				pit.update(OperationType.LEFT);
 			}
 		
@@ -270,10 +291,10 @@ public class GameplayState extends BasicGameState {
 				keyRepeat -= delta;
 				if(keyRepeat<=0) {
 					pit.update(OperationType.RIGHT);
-					keyRepeat = keyRepeatInterval;
+					keyRepeat = KEY_REPEAT_INTERVAL;
 				}
 			} else {
-				keyRepeat = firstKeyRepeatInterval;
+				keyRepeat = FIRST_KEY_REPEAT_INTERVAL;
 				pit.update(OperationType.RIGHT);
 			}
 	

@@ -36,7 +36,7 @@ public class MainMenuState extends BasicGameState {
 	Music music = null;
 	
 	AngelCodeFont highScoreFont = null;	//font to write the scoreboard on the screen with
-	Color myOrange = null;				//color of highScoreFont
+	Color myOrange = new Color(0xF24C00);				//color of highScoreFont
 	
 	boolean initialized = false;		//Makes sure certain unstable statements are executed only once
     
@@ -59,7 +59,6 @@ public class MainMenuState extends BasicGameState {
 		board = new ScoreBoard(10, "res/scoreboard.board");		//make a new scoreboard to hold the high scores
 
 		highScoreFont = new AngelCodeFont("res/fnt/NewFutura.fnt", "res/fnt/NewFutura_0.png");		//load the font
-		myOrange = new Color(0xF24C00);			//set the color of myOrange
 		
 		
 		scoreBoard = board.toString();		//make the scoreboard string file
