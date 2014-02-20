@@ -1,34 +1,10 @@
-Colors do not match between rotations:
-	For example:
-	
-	T does this:
-	
-	
-	ooo
-	 X
-	 
-	o
-	Xo
-	o
-	
-	 o
-	oXo
-	
-	 o
-	oX
-	 o
-	 
-	 
-	For Frivolousness' sake, I could rearrange the arrays to handle rotation for all cases (including O, whose colors always stay the same)
-	To more closely clone Tetris's behavior, I could make all the squares in a TetraBlock the same color.
-
-
 Finish the pause-game screen 
 	clickable buttons:
 	 - exit
 	 - return to menu
 	 - resume 
-	
+	Pause menu is currently semi-functional
+	I mean, at least it says "pause"
 	
 Handle line detection (*cough cough*)
 	or give up and make anti-tetris
