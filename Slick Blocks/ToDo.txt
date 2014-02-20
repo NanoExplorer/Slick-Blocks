@@ -1,0 +1,43 @@
+Colors do not match between rotations:
+	For example:
+	
+	T does this:
+	
+	
+	ooo
+	 X
+	 
+	o
+	Xo
+	o
+	
+	 o
+	oXo
+	
+	 o
+	oX
+	 o
+	 
+	 
+	For Frivolousness' sake, I could rearrange the arrays to handle rotation for all cases (including O, whose colors always stay the same)
+	To more closely clone Tetris's behavior, I could make all the squares in a TetraBlock the same color.
+
+
+Finish the pause-game screen 
+	clickable buttons:
+	 - exit
+	 - return to menu
+	 - resume 
+	
+	
+Handle line detection (*cough cough*)
+	or give up and make anti-tetris
+	
+
+Scoring!
+
+	Tetris:
+		lines give you points.
+		
+	anti-tetris
+		blocks give you points - higher y values = more points.

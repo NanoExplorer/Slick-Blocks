@@ -7,7 +7,15 @@ import org.newdawn.slick.Image;
 import com.rooneyworks.Blocks.*;
 
 public class Pit {
-
+	/*the pit coordinate system works as follows:
+	x,0 is below the bottom of where the pit appears to be.
+	x,1 is the "bottom" row of the pit.
+	0,y is the leftmost column of the pit.
+	etc.
+	9,y is the rightmost column,
+	x,20 is the topmost row.
+	
+	*/
 	private int[] [] fallenBlocks = null; //-1= unoccupied, 0, 1, 2, 3 = colors
 	//private int[] [] fallenBlocksTwo = null; //a copy of fallenBlocks that exists for the sole purpose of facilitating the row delete animation
 	ArrayList<Image> blockImages = null;
@@ -44,7 +52,7 @@ public class Pit {
 		for(int blocknum = 0; blocknum < 4; blocknum ++) { //render currently falling block
 			x = blockInfo[0] [blocknum];
 			y = blockInfo[1] [blocknum];
-			color = blockInfo[2] [blocknum] - 1;
+			color = blockInfo[2] [blocknum];
 			blockImages.get(color).draw(x*blockSize+PIT_X, PIT_Y + (blockSize* ( 20 - y)));
 		}
 		
@@ -81,6 +89,7 @@ public class Pit {
 				fallenBlocks[x][y] = -1;
 			}
 		}
+		keepGoing = true;
 		
 		
 		

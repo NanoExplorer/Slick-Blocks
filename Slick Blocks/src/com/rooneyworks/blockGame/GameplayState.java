@@ -11,6 +11,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+
 import com.rooneyworks.blockGame.AnimationStates;
 //import com.rooneyworks.Blocks.*;
 
@@ -19,16 +20,16 @@ public class GameplayState extends BasicGameState {
 	
 	int stateID = -1;				//The identification number for the state
 	
-	Image background = null;		
-	Image transparentThingy = null; //I'm pretty sure this is the hud overlay
-	Image master = null;			//holds misc gameplay textures
-	Image ready = null;				//holds image that says "ready"	
-	Image set = null;				//"set" (you get the idea)
-	Image go = null;
+	Image background;		
+	Image transparentThingy; //I'm pretty sure this is the hud overlay
+	Image master;			//holds misc gameplay textures
+	Image ready;				//holds image that says "ready"	
+	Image set;				//"set" (you get the idea)
+	Image go;
 	
-	ArrayList<Image> blockImages = null;
-	Pit pit = null;
-	DisplayPit pitTwo = null;
+	ArrayList<Image> blockImages;
+	Pit pit;
+	DisplayPit pitTwo;
 	
 	int timeToFall;
 	int fallInterval;
@@ -40,7 +41,7 @@ public class GameplayState extends BasicGameState {
 	int lastKey;
 	
 	int animationTimer;
-	int pauseDelayTimer; //makes sure that you can't just hold down space and play the game at 1/2 speed
+	//int pauseDelayTimer; //makes sure that you can't just hold down space and play the game at 1/2 speed
 	final int PAUSE_DELAY_TIME = 1000; //How long the game will delay before letting you pause or unpause again. (This is basically an animation timer)
 	final int PAUSE_ANIM_DELAY =20;
 	
@@ -61,7 +62,6 @@ public class GameplayState extends BasicGameState {
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
-		// TODO Auto-generated method stub
 		background = new Image("res/gameBackground.jpg");
 		master = new Image("res/gamePlayTextures.png");
 		ready = new Image("res/Ready.png");
@@ -69,15 +69,13 @@ public class GameplayState extends BasicGameState {
 		go = new Image("res/Go.png");
 		transparentThingy = master.getSubImage(29, 0, 287, 573);
 		scale = 1;
-		pauseDelayTimer = 0;
+		//pauseDelayTimer = 0;
 		
 		ArrayList<Image> blockImages = new ArrayList<Image>();
 		 
 		for(int i = 0; i < 4; i++)
 		   blockImages.add(master.getSubImage(0, i*28, 28, 28));
-		
-		blockAnimationX = blockAnimationY = 0;
-		
+				
 		pit = new Pit(blockImages);
 		pitTwo = new DisplayPit(blockImages);
 		timeToFall = 0;
@@ -85,8 +83,11 @@ public class GameplayState extends BasicGameState {
 		keyRepeat = FIRST_KEY_REPEAT_INTERVAL;
 		animationTimer = 2000; //animationtimer will start out counting down to zero and will be used to calculate when to display the "ready set go" animation
 		animationState = AnimationStates.READY;
-		theFont = new AngelCodeFont("res/fnt/GameGui.fnt", "res/fnt/GameGui_0.png");		//load the font (Used for scores and other stuff)
+		theFont = new AngelCodeFont("res/fnt/GameGui.fnt", "res/fnt/GameGui_0.png");	//load the font (Used for scores and other stuff)
 		myOrange = new Color(0xF24C00);			//set the color of myOrange
+		
+		blockAnimationX = 0;
+		blockAnimationY = 1;
 		
 		
 	}
@@ -94,7 +95,6 @@ public class GameplayState extends BasicGameState {
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
-		// TODO Auto-generated method stub
 		background.draw(0, 0);
 		transparentThingy.draw(48,15);
 		
@@ -117,15 +117,19 @@ public class GameplayState extends BasicGameState {
 			break;
 		case PAUSED:
 			pitTwo.render(g);
+			theFont.drawString(100, 300, "Paused", new Color(0x000000));
 			break;
 		case GAME_OVER:
 			pit.render(g);
+			theFont.drawString(400, 200, "GAME OVER", myOrange);
 			break;
 		case PAUSE_IN:
 			pitTwo.render(g);
+			theFont.drawString(100, 300, "Paused", new Color(0x000000));
 			break;
 		case PAUSE_OUT:
 			pitTwo.render(g);
+			theFont.drawString(100, 300, "Paused", new Color(0x000000));
 			break;
 		}
 	}
@@ -135,10 +139,14 @@ public class GameplayState extends BasicGameState {
 			throws SlickException {
 		Input input = container.getInput();
 		
-		if(pauseDelayTimer > 0) {
-			pauseDelayTimer -= delta;
+		//if(pauseDelayTimer > 0) {
+		//	pauseDelayTimer -= delta;
+		//}
+		if(input.isKeyDown(Input.KEY_ESCAPE)){
+			reset();
+			game.enterState(SlickBlocksGame.MAINMENUSTATE);
+			
 		}
-		
 		
 		switch(animationState) {
 		case READY:
@@ -178,9 +186,9 @@ public class GameplayState extends BasicGameState {
 			rowAnimation();
 			break;
 		case PAUSED:
-			if(input.isKeyDown(Input.KEY_SPACE) && pauseDelayTimer <= 0){
-				animationState = AnimationStates.PLAYING;
-				pauseDelayTimer = PAUSE_DELAY_TIME;
+			if(input.isKeyDown(Input.KEY_SPACE)){
+				animationState = AnimationStates.PAUSE_OUT;
+				
 			}
 			//display pause menu....
 			break;
@@ -188,13 +196,17 @@ public class GameplayState extends BasicGameState {
 			//play game over animation
 			break;
 		case PAUSE_IN:
-			blockAnimationX = 0;
-			blockAnimationY = 1;
-			if(blockAnimationY % 2 ==0) {
+			
+			myOrange.a = 1;
+			
+			//increment/decrement the x coord
+			if(blockAnimationY % 2 !=0) {
 				blockAnimationX++;
 			} else {
 				blockAnimationX--;
 			}
+			
+			//calculate whether to increment y
 			if(blockAnimationX >= 10) {
 				blockAnimationY++;
 				blockAnimationX -= 1;
@@ -202,25 +214,47 @@ public class GameplayState extends BasicGameState {
 				blockAnimationY++;
 				blockAnimationX += 1;
 			}
-			if(blockAnimationY >= 20) {
+			
+			//check if we need to go to pause state
+			if(blockAnimationY > 20) {
 				animationState = AnimationStates.PAUSED;
+				break;
 				
 			}
-			pitTwo.setBlock(blockAnimationX, blockAnimationY, 1);
-			
+			pitTwo.setBlock(blockAnimationX, blockAnimationY, 0);
 			break;
 		case PAUSE_OUT:
+			
+			//increment/decrement the x coord
+			if(blockAnimationY % 2 ==0) {
+				blockAnimationX++;
+			} else {
+				blockAnimationX--;
+			}
+			
+			//calculate whether to increment y
+			if(blockAnimationX >= 10) {
+				blockAnimationY--;
+				blockAnimationX -= 1;
+			} else if (blockAnimationX < 0) {
+				blockAnimationY--;
+				blockAnimationX += 1;
+			}
+			
+			//check if we need to go to pause state
+			if(blockAnimationY < 1) {
+				animationState = AnimationStates.PLAYING;
+				break;
+				
+			}
+			pitTwo.setBlock(blockAnimationX, blockAnimationY, pit.getPit()[blockAnimationX][blockAnimationY]);
 			break;
 		}
 		
 	}
 
 	public void rowAnimation() {
-		//The pit will need to do most of the logic, such as the block flashing. 
-		//this animation routine will take care of coordinating WHEN the blocks disappear and when they reappear.
-		//the hard part will be making sure the pit can "remember" what colors the blocks were so that the red block doesn't flash
-		//between red and, say, blue.
-		//I think that the best way to do this will be to make two copies of the pit array, one with the rows still there, one that doesn't
+		
 	}
 	
 	public void readyAnimation(int delta) {
@@ -249,7 +283,6 @@ public class GameplayState extends BasicGameState {
 	 * @param input an Input object (from Slick)
 	 * @param delta an int containing the time it took from the last update to this update
 	 */
-	
 	public void updatePlaying(Input input, int delta) {
 		if(timeToFall <1) {						//So apparently timeToFall keeps track of when the blocks fall and the block falls when it reaches zero
 			pit.update(OperationType.DROP);		//tells the block to drop (Pit keeps track of blocks and locations
@@ -304,10 +337,10 @@ public class GameplayState extends BasicGameState {
 			timeToFall -= 4*delta;
 			lastKey = Input.KEY_DOWN;
 			
-		} else if(input.isKeyDown(Input.KEY_SPACE) && pauseDelayTimer <= 0){ //PAUSE MENU!!!!!!!!!!!!!!
+		} else if(input.isKeyDown(Input.KEY_SPACE)){ //PAUSE MENU!!!!!!!!!!!!!!
 			animationState = AnimationStates.PAUSE_IN;
-			pauseDelayTimer = PAUSE_DELAY_TIME;
 			pitTwo.copyArray(pit.getPit());
+			pitTwo.setBlock(0, 1, 0);
 		
 		
 		} else {
@@ -315,12 +348,20 @@ public class GameplayState extends BasicGameState {
 		}
 	
 		if(!pit.keepGoing) {
-			animationState = AnimationStates.GAME_OVER;			//doesn't do anything yet...
+			animationState = AnimationStates.GAME_OVER;	
+			myOrange.a = 1;
 		}
 		
 		if(pit.completedRows) {
 			animationState = AnimationStates.DELETING_ROW;		//doesn't do anything yet...
 		}
-}
+	}
 
+	public void reset() {
+		this.pit.reset();
+		this.pitTwo.reset();
+		this.animationTimer = 2000;
+		this.animationState = AnimationStates.READY;
+		
+	}
 }

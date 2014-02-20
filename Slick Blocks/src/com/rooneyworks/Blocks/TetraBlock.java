@@ -2,11 +2,12 @@ package com.rooneyworks.Blocks;
 
 
 
+import java.util.Random;
+
 import com.rooneyworks.Blocks.Block;
 import com.rooneyworks.Blocks.TetraType;
 
 public class TetraBlock {
-	
 	
 	private int blockyX;
 	private int blockyY;
@@ -22,9 +23,9 @@ public class TetraBlock {
 	
 	public TetraBlock(TetraType blockType) { 
 		tetraMap = blockType.blockMap [0];
-
+		Random randomGen = new Random();
 		for(int i = 0; i < 4; i++) {
-			fourBlocks[i] = new Block(5 + tetraMap[0][i], 19+tetraMap[1][i], (int)Math.ceil(Math.random() * 3) + 1);
+			fourBlocks[i] = new Block(5 + tetraMap[0][i], 19+tetraMap[1][i], randomGen.nextInt(4));
 		}
 		
 		blockyX = 5;
@@ -67,11 +68,13 @@ public class TetraBlock {
 				if(rotation >= 4) 
 					rotation = 0;
 			}
-		}while(!canFit);
+		}while(!canFit);	//This looks reeeeally sketchy.
 		update();
 	}
 	
 	public int[] [] fall(int[] [] blockMap) {
+
+		
 		boolean move = true;
 		int currentBlockX, currentBlockY;
 		
@@ -94,7 +97,7 @@ public class TetraBlock {
 			//this is where the blocks hit the ground
 			isFalling = false;
 			for(Block thisBlock : fourBlocks) {
-				blockMap[thisBlock.getBlockyX()] [thisBlock.getBlockyY()] = thisBlock.getcolor() - 1;
+				blockMap[thisBlock.getBlockyX()] [thisBlock.getBlockyY()] = thisBlock.getcolor();
 				
 			}
 		}
